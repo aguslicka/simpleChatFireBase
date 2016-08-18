@@ -7,27 +7,37 @@
 </head>
 <body>
 <div id='messagesDiv'></div>
-<input type='text' id='nameInput' placeholder='Name'>
-<input type='text' id='messageInput' placeholder='Message...'>
+<input type='text' id='nameInput' placeholder='Usuario' style= 'box-shadow: 6px -2px 10px 10px red;
+    border-radius: 15px;'>
+<input type='text' id='messageInput' placeholder='Mensaje...' style= 'box-shadow: 6px -2px 10px 10px red;
+    border-radius: 15px;'>
 <script type='text/javascript'>
 
   // Aca ponemos la referencia a su firebase
-  var messagesRef = new Firebase('https://algo.firebaseio-demo.com/');
+  var messagesRef = new Firebase('https://incandescent-fire-1267.firebaseio.com/chatub');
 
   // Cuando presionen el ENTER , guardamos los datos en firebase.
   $('#messageInput').keypress(function (e) {
     if (e.keyCode == 13) {
-      var name = $('#nameInput').val();
-      var text = $('#messageInput').val();
-      messagesRef.push({name:name, text:text});
+      var nombre = $('#nameInput').val();
+      var texto = $('#messageInput').val();
+      var fechaIngreso=Firebase.ServerValue.TIMESTAMP ;
+      console.log(fechaIngreso);
+      messagesRef.push({usuario:nombre, mensaje:texto, cuando:fechaIngreso});
       $('#messageInput').val('');
     }
   });
 
   // agregamos la funcion que funciona de callback que es disparada por cada mensaje de chat.
   messagesRef.on('child_added', function (snapshot) {
-    var message = snapshot.val();
-    $('<div/>').text(message.text).prepend($('<em/>').text(message.name+': ')).appendTo($('#messagesDiv'));
+    var mensajedefirebase = snapshot.val();
+   // console.log(mensajedefirebase.cuando);
+   var fechaIngreso =new Date(mensajedefirebase.cuando);
+  //var nuevaFecha =fechaIngreso.toDateString();
+   var hora=fechaIngreso.getHours()
+   var minutos=fechaIngreso.getMinutes()
+   console.log(fechaIngreso);
+    $('<div/>').text(mensajedefirebase.mensaje+ "->" + hora+ ":"+ minutos).prepend($('<em/>').text(mensajedefirebase.usuario+': ')).appendTo($('#messagesDiv'));
     $('#messagesDiv')[0].scrollTop = $('#messagesDiv')[0].scrollHeight;
   });
 </script>
